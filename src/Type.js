@@ -12,7 +12,7 @@ class Type{
     }
 
     equals(other){
-        return this.name === other;
+        return this.name === other || this === other;
     }
 }
 

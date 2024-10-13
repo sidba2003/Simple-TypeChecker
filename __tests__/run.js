@@ -1,7 +1,8 @@
 const TC =  require('../src/tc.js');
 
 const tests = [
-    require('./self-eval-test.js')
+    require('./self-eval-test.js'),
+    require('./math-test.js')
 ]
 
 
