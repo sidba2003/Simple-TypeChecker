@@ -10,7 +10,7 @@ function test(typeChecker, exp, expected){
     try{
         assert.strictEqual(actual.equals(expected), true);
     } catch(err){
-        console.log(`Expected ${expected} but got ${actual}`)
+        console.log(`Expected ${expected} but got ${actual} for ${exp}`)
         throw err;
     }
 }

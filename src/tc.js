@@ -1,7 +1,12 @@
 const Type = require('./Type.js');
+const TypeEnvironment = require('./TypeEnvironment.js');
 
 class TC {
-    tc(exp){
+    constructor(){
+        this.global = this._createGlobal();
+    }
+
+    tc(exp, env = this.global){
         if (this._isNumber(exp)){
             return Type.number;
         }
@@ -11,21 +16,44 @@ class TC {
         }
 
         if (this._isBinary(exp)){
-            return this._binary(exp);
+            return this._binary(exp, env);
+        }
+
+        if (exp[0] == 'var'){
+            const [_tag, name, value] = exp;
+
+            const valueType = this.tc(value, env);
+
+            if (Array.isArray(name)){
+                const [varName, typeStr] = name;
+                const expectedType = Type.fromString(typeStr);
+
+                this._expect(valueType, expectedType, value, exp);
+                return env.define(varName, expectedType);
+            }
+            return env.define(name, valueType);
+        }
+
+        if (this._isVariableName(exp)){
+            return env.lookup(exp);
         }
 
         throw `Uknown expression for type ${exp}!!`;
+    }
+
+    _isVariableName(exp){
+        return typeof exp === 'string' && /^[+\-*/<>=a-zA-Z0-9_:]+$/.test(exp);
     }
 
     _isBinary(exp){
         return /^[+\-*/]$/.test(exp[0]);
     }
 
-    _binary(exp){
+    _binary(exp, env){
         this._checkArity(exp, 2);
 
-        const t1 = this.tc(exp[1]);
-        const t2 = this.tc(exp[2]);
+        const t1 = this.tc(exp[1], env);
+        const t2 = this.tc(exp[2], env);
 
         const acceptedTypes = this._acceptedTypes(exp[0])
 
@@ -73,6 +101,12 @@ class TC {
 
     _isString(exp){
         return typeof exp === 'string' && exp[0] == '"' && exp.slice(-1) == '"';
+    }
+
+    _createGlobal(){
+        return new TypeEnvironment({
+            VERSION: Type.string,
+        });
     }
     
 }
