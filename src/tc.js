@@ -6,6 +6,18 @@ class TC {
         this.global = this._createGlobal();
     }
 
+    _tcGlobal(exp){
+        return this._tcBody(exp, this.global);
+    }
+
+    _tcBody(body, env){
+        if (body[0] == 'begin'){
+            return this._tcBlock(body, env);
+        }
+
+        return this.tc(body, env);
+    }
+
     tc(exp, env = this.global){
         if (this._isNumber(exp)){
             return Type.number;

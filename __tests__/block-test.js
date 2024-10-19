@@ -38,4 +38,14 @@ module.exports = typeChecker => {
         Type.number
     );
 
+    test(typeChecker, `(var x 10)`, Type.number);
+
+    test(
+        typeChecker,
+        `
+            (var y 20)
+            (+ (* x 10) y)
+        `, Type.number
+    );
+
 }
