@@ -26,5 +26,6 @@ class Type{
 
 Type.number = new Type('number');
 Type.string = new Type('string');
+Type.boolean = new Type('boolean');
 
 module.exports = Type;

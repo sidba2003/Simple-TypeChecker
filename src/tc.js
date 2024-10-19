@@ -27,8 +27,8 @@ class TC {
             return Type.string;
         }
 
-        if (this._isBinary(exp)){
-            return this._binary(exp, env);
+        if (this._isBoolean(exp)){
+            return Type.boolean;
         }
 
         if (exp[0] == 'var'){
@@ -64,7 +64,63 @@ class TC {
             return this._tcBlock(exp, blockEnv);
         }
 
+        if (exp[0] == 'if'){
+            const [_tag, condition, consequent, alternate] = exp;
+
+            const t1 = this.tc(condition, env);
+            this._expect(t1, Type.boolean, condition, exp);
+
+            const t2 = this.tc(consequent, env);
+            const t3 = this.tc(alternate, env);
+
+            return this._expect(t3, t2, exp, exp);
+        }
+
+        if (exp[0] == 'while'){
+            console.log(exp);
+            const [_tag, condition, body] = exp;
+            
+            const t1 = this.tc(condition, env);
+            this._expect(t1, Type.boolean, condition, exp);
+
+            return this.tc(body, env);
+        }
+
+        if (this._isBinary(exp)){
+            return this._binary(exp, env);
+        }
+
+        if (this._isBooleanBinary(exp)){
+            return this._booleanBinary(exp, env);
+        }
+
         throw `Uknown expression for type ${exp}!!`;
+    }
+
+    _isBooleanBinary(exp){
+        return (
+            exp[0] === '==' ||
+            exp[0] === '!=' ||
+            exp[0] === '>=' ||
+            exp[0] === '<=' ||
+            exp[0] === '<' ||
+            exp[0] === '>'
+        );
+    }
+
+    _booleanBinary(exp, env){
+        this._checkArity(exp, 2);
+
+        const t1 = this.tc(exp[1], env);
+        const t2 = this.tc(exp[2], env);
+
+        this._expect(t2, t1, exp[2], exp);
+
+        return Type.boolean;
+    }
+
+    _isBoolean(exp){
+        return typeof exp === 'boolean' || exp === 'true' || exp === 'false';
     }
 
     _tcBlock(block, env){
