@@ -3,7 +3,8 @@ const TC =  require('../src/tc.js');
 const tests = [
     require('./self-eval-test.js'),
     require('./math-test.js'),
-    require('./variable-test.js')
+    require('./variable-test.js'),
+    require('./block-test.js')
 ]
 
 

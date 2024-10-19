@@ -38,7 +38,33 @@ class TC {
             return env.lookup(exp);
         }
 
+        if (exp[0] == 'set'){
+            const [_, ref, value] = exp;
+
+            const valueType = this.tc(value, env);
+            const varType = this.tc(ref, env);
+
+            return this._expect(valueType, varType, value, exp);
+        }
+
+        if (exp[0] == 'begin'){
+            const blockEnv = new TypeEnvironment({}, env);
+            return this._tcBlock(exp, blockEnv);
+        }
+
         throw `Uknown expression for type ${exp}!!`;
+    }
+
+    _tcBlock(block, env){
+        let result;
+
+        const [_tag, ...expressions] = block;
+
+        expressions.forEach(exp => {
+            result = this.tc(exp, env);
+        });
+
+        return result;
     }
 
     _isVariableName(exp){

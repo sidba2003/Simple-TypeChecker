@@ -10,11 +10,19 @@ class TypeEnvironment{
     }
 
     lookup(name){
-        if (!this.record.hasOwnProperty(name)){
-            throw new ReferenceError(`Variable "${name}" is not defined.`);
+        return this.resolve(name).record[name];
+    }
+
+    resolve(name){
+        if (this.record.hasOwnProperty(name)){
+            return this;
         }
 
-        return this.record[name];
+        if (this.parent == null){
+            throw new ReferenceError(`Variable "${name}" is not defined.`)
+        }
+
+        return this.parent.resolve(name);
     }
 }
 
