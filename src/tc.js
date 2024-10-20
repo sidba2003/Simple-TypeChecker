@@ -77,13 +77,17 @@ class TC {
         }
 
         if (exp[0] == 'while'){
-            console.log(exp);
             const [_tag, condition, body] = exp;
             
             const t1 = this.tc(condition, env);
             this._expect(t1, Type.boolean, condition, exp);
 
             return this.tc(body, env);
+        }
+
+        if (exp[0] == 'def'){
+            const [_tag, name, params, _retDel, returnTypeStr, body] = exp;
+            return env.define(name, this._tcFunction(params, returnTypeStr, body, env));
         }
 
         if (this._isBinary(exp)){
@@ -95,6 +99,32 @@ class TC {
         }
 
         throw `Uknown expression for type ${exp}!!`;
+    }
+
+    _tcFunction(params, returnTypeStr, body, env){
+        const returnType = Type.fromString(returnTypeStr);
+
+        const paramsRecord = {};
+        const paramTypes = [];
+
+        params.forEach(([name, typeStr]) => {
+            const paramType = Type.fromString(typeStr);
+            paramsRecord[name] = paramType;
+            paramTypes.push(paramType);
+        });
+
+        const fnEnv = new TypeEnvironment(paramsRecord, env);
+
+        const actualReturnType = this._tcBody(body, fnEnv);
+
+        if (!returnType.equals(actualReturnType)){
+            throw `Expected function ${body} to return ${returnType}, but got ${actualReturnType}`;
+        }
+
+        return new Type.Function({
+            paramTypes: paramTypes,
+            returnType: returnType
+        });
     }
 
     _isBooleanBinary(exp){
