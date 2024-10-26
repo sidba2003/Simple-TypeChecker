@@ -7,7 +7,8 @@ const tests = [
     require('./block-test.js'),
     require('./if-test.js'),
     require('./while-test.js'),
-    require('./user-defined-functions.js')
+    require('./user-defined-functions.js'),
+    require('./built-in-function-test.js')
 ]
 
 

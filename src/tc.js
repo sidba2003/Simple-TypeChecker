@@ -250,6 +250,7 @@ class TC {
     _createGlobal(){
         return new TypeEnvironment({
             VERSION: Type.string,
+            'sum': new Type.Function({paramTypes: [Type.number, Type.number], returnType: Type.number})
         });
     }
     
