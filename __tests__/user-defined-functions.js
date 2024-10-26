@@ -16,4 +16,12 @@ module.exports = typeChecker => {
             ))
             
         (calc 10 20)`, Type.number);
+    
+        test(typeChecker,
+            `
+                (def factorial ((x number)) -> number
+                    (factorial (- x 1)))
+                (factorial 5)
+            `, Type.number
+        );
 }

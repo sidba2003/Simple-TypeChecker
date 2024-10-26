@@ -87,7 +87,12 @@ class TC {
 
         if (exp[0] == 'def'){
             const [_tag, name, params, _retDel, returnTypeStr, body] = exp;
-            return env.define(name, this._tcFunction(params, returnTypeStr, body, env));
+            return env.define(name, this._tcFunction(params, returnTypeStr, body, env, name));
+        }
+
+        if (exp[0] === 'lambda'){
+            const [_tag, params, _retDel, returnTypeStr, body] = exp;
+            return this._tcFunction(params, returnTypeStr, body, env, null);
         }
 
         if (this._isBinary(exp)){
@@ -121,7 +126,7 @@ class TC {
         return fn.returnType;
     }
 
-    _tcFunction(params, returnTypeStr, body, env){
+    _tcFunction(params, returnTypeStr, body, env, name){
         const returnType = Type.fromString(returnTypeStr);
 
         const paramsRecord = {};
@@ -134,6 +139,9 @@ class TC {
         });
 
         const fnEnv = new TypeEnvironment(paramsRecord, env);
+
+        // to enable recursion, we add the function name to the environment
+        fnEnv.define(name, new Type.Function({paramTypes: paramTypes, returnType: returnType}))
 
         const actualReturnType = this._tcBody(body, fnEnv);
 
