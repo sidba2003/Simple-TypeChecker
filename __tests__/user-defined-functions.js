@@ -4,9 +4,8 @@ const {test} = require('./test-util.js');
 module.exports = typeChecker => {
     test(typeChecker,
         `(def square ((x number)) -> number 
-            (* x x))`,
-        Type.fromString('Fn<number<number>>')
-    );
+            (* x x))
+        (square 2)`, Type.number);
 
     test(typeChecker,
         `
@@ -14,7 +13,7 @@ module.exports = typeChecker => {
             (begin
                 (var z 30)
                 (+ (* x y) z)
-            ))`, 
-        Type.fromString('Fn<number<number,number>>')
-    );
+            ))
+            
+        (calc 10 20)`, Type.number);
 }

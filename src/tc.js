@@ -98,7 +98,27 @@ class TC {
             return this._booleanBinary(exp, env);
         }
 
+        if (Array.isArray(exp)){
+            const fn = this.tc(exp[0], env);
+            const argValues = exp.slice(1);
+
+            const argTypes = argValues.map(arg => this.tc(arg, env));
+            return this._checkFunctionCalls(fn, argTypes, env, exp);
+        }
+
         throw `Uknown expression for type ${exp}!!`;
+    }
+
+    _checkFunctionCalls(fn, argTypes, env, exp){
+        if (fn.paramTypes.length != argTypes.length){
+            throw `\nFunction ${exp[0]} ${fn.getName()} expects ${fn.paramTypes.length} arguments, ${argTypes.length} given in ${exp}.\n`;
+        }
+
+        argTypes.forEach((argType, index) => {
+            this._expect(argType, fn.paramTypes[index], argTypes[index], exp);
+        });
+
+        return fn.returnType;
     }
 
     _tcFunction(params, returnTypeStr, body, env){
