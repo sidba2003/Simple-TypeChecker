@@ -1,3 +1,5 @@
+const TypeEnvironment = require("./TypeEnvironment");
+
 class Type{
     constructor(name){
         this.name = name;
@@ -31,6 +33,7 @@ class Type{
 Type.number = new Type('number');
 Type.string = new Type('string');
 Type.boolean = new Type('boolean');
+Type.null = new Type('null');
 
 Type.Function = class extends Type {
     constructor({name = null, paramTypes, returnType}) {
@@ -99,6 +102,30 @@ Type.Function = class extends Type {
         throw `Type.Function.fromString: Unknown Type: ${typeStr}`;
     }
 };
+
+Type.Class = class extends Type {
+    constructor({name, superClass = Type.null}){
+        super(name);
+        this.superClass = superClass;
+        this.env = new TypeEnvironment({}, superClass != Type.null ? superClass.env : null);
+    }
+
+    getField(name){
+        return this.env.lookup(name);
+    }
+
+    equals(other){
+        if (this ===other){
+            return true;
+        }
+
+        if (this.superClass != Type.null){
+            return this.superClass.equals(other);
+        }
+
+        return false;
+    }
+}
 
 
 module.exports = Type;

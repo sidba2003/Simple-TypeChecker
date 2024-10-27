@@ -95,6 +95,18 @@ class TC {
             return this._tcFunction(params, returnTypeStr, body, env, null);
         }
 
+        if (exp[0] === 'class'){
+            const [_tag, name, superClassName, body] = exp;
+            const superClass = Type[superClassName];
+
+            const classType = new Type.Class({name, superClass});
+
+            Type[name] = env.define(name, classType);
+            this._tcBody(body, classType.env);
+
+            return classType;
+        }
+
         if (this._isBinary(exp)){
             return this._binary(exp, env);
         }
