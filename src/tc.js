@@ -109,11 +109,6 @@ class TC {
             const [_tag, name, superClassName, body] = exp;
             const superClass = Type[superClassName];
 
-            console.log(body[1]);
-            console.log(body[2]);
-            console.log(body[3]);
-            console.log(body[4]);
-
             const classType = new Type.Class({name, superClass});
 
             Type[name] = env.define(name, classType);
