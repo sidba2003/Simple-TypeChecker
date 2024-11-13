@@ -53,6 +53,16 @@ class TC {
         if (exp[0] == 'set'){
             const [_, ref, value] = exp;
 
+            if (ref[0] === 'prop'){
+                const [_tag, instance, propName] = ref;
+                const instnceType = this.tc(instance, env);
+
+                const valueType = this.tc(value, env);
+                const propType = instnceType.getField(propName);
+
+                return this._expect(valueType, propType, value, exp);
+            }
+
             const valueType = this.tc(value, env);
             const varType = this.tc(ref, env);
 
@@ -99,12 +109,44 @@ class TC {
             const [_tag, name, superClassName, body] = exp;
             const superClass = Type[superClassName];
 
+            console.log(body[1]);
+            console.log(body[2]);
+            console.log(body[3]);
+            console.log(body[4]);
+
             const classType = new Type.Class({name, superClass});
 
             Type[name] = env.define(name, classType);
             this._tcBody(body, classType.env);
 
             return classType;
+        }
+
+        if (exp[0] === 'new'){
+            const [_tag, className, ...argsValues] = exp;
+
+            const classType = Type[className];
+
+            if (classType == null){
+                throw `Unknown class ${className}.`;
+            }
+
+            const argTypes = argsValues.map(arg => this.tc(arg, env));
+
+            return this._checkFunctionCalls(
+                classType.env.lookup('constructor'), 
+                [classType, ...argTypes], 
+                env, 
+                exp
+            );
+        }
+
+        if (exp[0] === 'prop'){
+            const [_tag, instance, name] = exp;
+
+            const instanceType = this.tc(instance, env);
+
+            return instanceType.getField(name);
         }
 
         if (this._isBinary(exp)){
