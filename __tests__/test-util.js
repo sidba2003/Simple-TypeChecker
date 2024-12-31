@@ -1,7 +1,12 @@
 const assert = require('assert');
+const parser = require('../parser/parser.js');
 
 function exec(tc, exp){
-    return tc.tc(exp);
+    if (typeof exp === 'string'){
+        exp = parser.parse(`(begin ${exp})`);
+    }
+
+    return tc.tcGlobal(exp);
 }
 
 function test(tc, exp, expected){
